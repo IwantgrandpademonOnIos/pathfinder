@@ -62,7 +62,7 @@ public:
         };
 
         Build<ButtonSprite>::create("Export", "bigFont.fnt", "GJ_button_01.png")
-            .intoMenuItem(async::wrapSpawn(callback))
+            .intoMenuItem(async::spawn(callback))
             .scale(0.8)
             .move(0, -40)
             .parent(getChildByID("menu"));
