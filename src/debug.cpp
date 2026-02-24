@@ -9,6 +9,7 @@ using namespace geode::utils::file;
 #include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/EditorPauseLayer.hpp>
 #include <Geode/modify/EditLevelLayer.hpp>
+#include <Geode/utils/async.hpp>
 #include <gdr/gdr.hpp>
 #include "subprocess.hpp"
 
