@@ -3,6 +3,7 @@
 #include <Geode/utils/coro.hpp>
 #include <Geode/modify/EditLevelLayer.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
+#include <Geode/utils/async.hpp>
 #include <UIBuilder.hpp>
 #include "pathfinder.hpp"
 #include <future>
