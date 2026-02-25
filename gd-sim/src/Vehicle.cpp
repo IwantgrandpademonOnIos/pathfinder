@@ -5,6 +5,7 @@
 #include <Slope.hpp>
 #include <cfloat>
 #include <cmath>
+#include <cstdlib>
 
 /*
 	For ship and ufo, there are two sets of acceleration values depending on the current
@@ -390,4 +391,7 @@ Vehicle Vehicle::from(VehicleType v) {
 		case VehicleType::Wave:
 			return wave();
 	}
+
+	// Invalid enum values can happen via corrupted/unsafe casts in external callers.
+	std::abort();
 }
