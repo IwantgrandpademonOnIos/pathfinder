@@ -6,6 +6,7 @@
 #include <cfloat>
 #include <cmath>
 #include <cstdlib>
+#include <stdexcept>
 
 /*
 	For ship and ufo, there are two sets of acceleration values depending on the current
@@ -392,6 +393,5 @@ Vehicle Vehicle::from(VehicleType v) {
 			return wave();
 	}
 
-	// Invalid enum values can happen via corrupted/unsafe casts in external callers.
-	std::abort();
+	throw std::invalid_argument("Unknown vehicle type");
 }
