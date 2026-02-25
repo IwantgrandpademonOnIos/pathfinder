@@ -5,6 +5,7 @@
 #include <Slope.hpp>
 #include <cfloat>
 #include <cmath>
+#include <cstdlib>
 #include <stdexcept>
 
 /*

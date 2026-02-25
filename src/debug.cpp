@@ -205,13 +205,15 @@ class $modify(EditLevelLayer) {
 
         btn->setTopRelativeScale(1.4);
 
-        btn.intoMenuItem(async::spawn([this](this auto self) -> arc::Future<void> {
-            auto lvlString = ZipUtils::decompressString(m_level->m_levelString, true, 0);
+        btn.intoMenuItem([this]() {
+            (void)async::spawn([this](this auto self) -> arc::Future<void> {
+                auto lvlString = ZipUtils::decompressString(m_level->m_levelString, true, 0);
 
-            if (auto val = co_await pick(PickMode::OpenFile, {}); val.isOk() && val.unwrap().has_value()) {
-                runTestSim(lvlString, *val.unwrap());
-            }
-        })).id("pathfinder-debug-button")
+                if (auto val = co_await pick(PickMode::OpenFile, {}); val.isOk() && val.unwrap().has_value()) {
+                    runTestSim(lvlString, *val.unwrap());
+                }
+            });
+        }).id("pathfinder-debug-button")
           .intoNewParent(CCMenu::create())
           .parent(this)
           .id("pathfinder-debug-menu")
