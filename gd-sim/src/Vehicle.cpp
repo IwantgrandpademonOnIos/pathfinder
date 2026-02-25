@@ -5,6 +5,7 @@
 #include <Slope.hpp>
 #include <cfloat>
 #include <cmath>
+#include <stdexcept>
 
 /*
 	For ship and ufo, there are two sets of acceleration values depending on the current
@@ -390,4 +391,6 @@ Vehicle Vehicle::from(VehicleType v) {
 		case VehicleType::Wave:
 			return wave();
 	}
+
+	throw std::invalid_argument("Unknown vehicle type");
 }
