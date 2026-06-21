@@ -34,7 +34,7 @@ void Player::preCollision(bool pressed) {
     for (auto& i : actions)
         i(*this);
     actions.clear();
-    potentialSlopes.clear();
+    potentialActions.clear();
 
     // Handle input
     if (button != pressed) {
