@@ -13,35 +13,20 @@ Entity Player::unrotatedHitbox() const {
 }
 
 void Player::setVelocity(double v, bool override) {
-	velocityOverride = override;
+    velocityOverride = override;
 
-	// Being small commonly means velocity is 4/5 the original velocity.
-	velocity = v * (small ? 0.8 : 1);
+    // Apply small-player scaling (2.2 uses 0.8x)
+    double newVel = v * (small ? 0.8 : 1.0);
 
-	if (v != 0)
-		grounded = false;
-}
+    // Apply upside-down inversion
+    if (upsideDown)
+        newVel = -newVel;
 
-Player const& Player::prevPlayer() const {
-	return level->getState(frame - 1);
-}
+    // If velocity is being set manually, player is no longer grounded
+    if (newVel != 0)
+        grounded = false;
 
-Player const* Player::nextPlayer() const {
-	return level->currentFrame() <= frame ? nullptr : &level->getState(frame + 1);
-}
-
-/**
- * In Geometry Dash, velocity is stored as 1/54 of distance per second.
- * It is also rounded to the nearest hundredth after (almost) every operation.
- * This function accounts for that rounding
- */
-double roundVel(double velocity, bool upsideDown) {
-	double nVel = velocity / 54.0 * (upsideDown * 2 - 1);
-	double floored = (int)nVel;
-	if (nVel != floored) {
-		nVel = (double)std::round((nVel - floored) * 1000.0) / 1000.0 + floored;
-	}
-	return nVel * 54.0 * (upsideDown * 2 - 1);
+    velocity = newVel;
 }
 
 void Player::preCollision(bool pressed) {
