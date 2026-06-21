@@ -45,34 +45,59 @@ double roundVel(double velocity, bool upsideDown) {
 }
 
 void Player::preCollision(bool pressed) {
-	pos.x += player_speeds[(int)speed] * dt;
-	pos.y += grav(velocity) * dt;
+    // Run queued actions (orb presses, triggers, etc.)
+    for (auto& i : actions)
+        i(*this);
+    actions.clear();
+    potentialSlopes.clear();
 
-	frame++;
-	timeElapsed += dt;
-	grounded = false;
-	velocityOverride = false;
-	gravityPortal = false;
-	roundVelocity = true;
+    // Handle input
+    if (button != pressed) {
+        button = pressed;
+        input = button;
+        buffer = button;
+    }
 
-	if (button != pressed) {
-		button = pressed;
-		input = button;
-		buffer = button;
-	}
+    // -------------------------------
+    // 2.2081 HORIZONTAL MOVEMENT
+    // -------------------------------
+    // Replace old 1.7 player_speeds[] with real 2.2 multipliers
+    double speedMul = Physics22081::SpeedMultipliers[(int)speed];
+    pos.x += speedMul * dt;
 
-	for (auto& i : actions)
-		i(*this);
-	actions.clear();
+    // -------------------------------
+    // 2.2081 VERTICAL MOVEMENT
+    // -------------------------------
+    if (!velocityOverride) {
+        // Apply 2.2 gravity
+        velocity += Physics22081::Gravity * dt;
 
-	potentialSlopes.clear();
+        // Clamp fall speed to 2.2 terminal velocity
+        if (velocity > Physics22081::MaxFallSpeed)
+            velocity = Physics22081::MaxFallSpeed;
+    }
 
-	// Downhill slopes snap you automatically
-	if (slopeData.slope && slopeData.slope->gravOrient(*this) == 1) {
-		grounded = true;
-	}
+    // Apply vertical movement
+    pos.y += velocity * dt;
+
+    // -------------------------------
+    // FRAME STATE UPDATES
+    // -------------------------------
+    frame++;
+    timeElapsed += dt;
+    grounded = false;
+    gravityPortal = false;
+
+    // 2.2 rounding rules will replace this later
+    roundVelocity = true;
+
+    // -------------------------------
+    // SLOPE AUTO-SNAP (still valid)
+    // -------------------------------
+    if (slopeData.slope && slopeData.slope->gravOrient(*this) == 1) {
+        grounded = true;
+    }
 }
-
 void Player::postCollision() {
 	// Size portal only affects hitbox size at the end of frame
 	if (small != prevPlayer().small) {
