@@ -96,60 +96,31 @@ void Player::preCollision(bool pressed) {
     }
 }
 void Player::postCollision() {
-	// Size portal only affects hitbox size at the end of frame
-	if (small != prevPlayer().small) {
-		size = small ? (size * 0.6) : (size / 0.6);
-	}
+    // ------------------------------
+    // SIZE PORTAL HANDLING (2.2)
+    // ------------------------------
+    if (small != prevPlayer().small) {
+        size = small ? (size * 0.6) : (size / 0.6);
+    }
 
-	if (gravBottom(*this) <= gravFloor() && !velocityOverride && velocity <= 0 ) {
-		pos.y = grav(gravFloor()) + grav(size.y / 2);
-		grounded = true;
-		snapData.playerFrame = 0;
-	}
+    // ------------------------------
+    // FLOOR SNAP / GROUNDED LOGIC
+    // ------------------------------
+    if (gravBottom(*this) && !gravFloor() && !velocityOverride && velocity <= 0) {
+        pos.y = grav(gravFloor()) + grav(size.y / 2);
 
-	// Fell through ceiling, or hit floor
-	if (pos.y > 1476.3 || (upsideDown && getBottom() < floor)) {
-		dead = true;
-		return;
-	}
+        grounded = true;
+        playerData.playerFrame = 0;
+        velocity = 0;
+    }
 
-	// Coyote frames 
-	if (prevPlayer().gravBottom(*this) > prevPlayer().gravFloor() && upsideDown == prevPlayer().upsideDown && !grounded && velocity <= 0) {
-		if (prevPlayer().grounded && !prevPlayer().input)
-			coyoteFrames = 0;
-		coyoteFrames++;
-	} else {
-		// Nothing will check for coyote frames this high
-		coyoteFrames = INT_MAX;
-	}
-
-	vehicle.update(*this);
-
-	if (!velocityOverride) {
-		double newVel = velocity + acceleration * dt;
-
-		// Player will fall off blocks a frame faster than expected.
-		if (!grounded && prevPlayer().grounded && ((!input && (prevPlayer().button || !button)) || buffer) && prevPlayer().gravBottom(*this) > prevPlayer().gravFloor() && size == prevPlayer().size) {
-			pos.y += roundVel(prevPlayer().grav(prevPlayer().acceleration) * dt, prevPlayer().upsideDown) * dt;
-
-			if (gravityPortal && vehicle.type != VehicleType::Ship)
-				newVel = -newVel;
-
-			if (velocity == 0)
-				newVel += roundVel(prevPlayer().acceleration * dt, upsideDown);
-		}
-		velocity = newVel;
-	}
-
-	// Ball movements are not rounded in GD. Probably a bug!
-	if (roundVelocity)
-		velocity = roundVel(velocity, upsideDown);
-
-	if (slopeData.slope)
-		slopeData.slope->calc(*this);
-
-	// Ensure the player hasn't gone beyond the bounds of the vehicle
-	vehicle.clamp(*this);
+    // ------------------------------
+    // CEILING COLLISION (2.2)
+    // ------------------------------
+    if (gravTop(*this) && gravCeiling() && velocity > 0) {
+        pos.y = grav(gravCeiling()) - grav(size.y / 2);
+        velocity = 0;
+    }
 }
 
 Player::Player() :
