@@ -4,6 +4,24 @@
 #include <cmath>
 #include <climits>
 
+double roundVel(double v, bool upsideDown) {
+    // Convert to GD units (1/54)
+    double n = v / 54.0;
+
+    // Apply upside-down inversion
+    if (upsideDown)
+        n = -n;
+
+    // Round to nearest hundredth (2.2 behavior)
+    n = std::round(n * 100.0) / 100.0;
+
+    // Convert back to internal units
+    if (upsideDown)
+        n = -n;
+
+    return n * 54.0;
+}
+
 Entity Player::innerHitbox() const {
 	return {pos, Vec2D{9, 9}, 0};
 }
