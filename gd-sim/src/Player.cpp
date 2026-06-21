@@ -58,42 +58,39 @@ void Player::preCollision(bool pressed) {
         buffer = button;
     }
 
-    // -------------------------------
+    // ------------------------------
     // 2.2081 HORIZONTAL MOVEMENT
-    // -------------------------------
-    // Replace old 1.7 player_speeds[] with real 2.2 multipliers
+    // ------------------------------
     double speedMul = Physics22081::SpeedMultipliers[(int)speed];
     pos.x += speedMul * dt;
 
-    // -------------------------------
+    // ------------------------------
     // 2.2081 VERTICAL MOVEMENT
-    // -------------------------------
+    // ------------------------------
     if (!velocityOverride) {
-        // Apply 2.2 gravity
         velocity += Physics22081::Gravity * dt;
 
-        // Clamp fall speed to 2.2 terminal velocity
         if (velocity > Physics22081::MaxFallSpeed)
             velocity = Physics22081::MaxFallSpeed;
+
+        if (velocity < -Physics22081::MaxRiseSpeed)
+            velocity = -Physics22081::MaxRiseSpeed;
     }
 
-    // Apply vertical movement
     pos.y += velocity * dt;
 
-    // -------------------------------
+    // ------------------------------
     // FRAME STATE UPDATES
-    // -------------------------------
+    // ------------------------------
     frame++;
     timeElapsed += dt;
     grounded = false;
     gravityPortal = false;
-
-    // 2.2 rounding rules will replace this later
     roundVelocity = true;
 
-    // -------------------------------
+    // ------------------------------
     // SLOPE AUTO-SNAP (still valid)
-    // -------------------------------
+    // ------------------------------
     if (slopeData.slope && slopeData.slope->gravOrient(*this) == 1) {
         grounded = true;
     }
